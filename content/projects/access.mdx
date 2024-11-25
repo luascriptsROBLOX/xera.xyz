@@ -1,1 +1,65 @@
+---
+title: "Xera"
+description: A forked, enhanced library for access control. Built for defining roles, managing access permissions, and verifying requests efficiently with opaque tokens.
+repository: luascriptsROBLOX/access
+date: "2024-11-25"
+published: true
+---
 
+This library is a **forked and customized version** of the original access control library by chronark. It provides a minimal and fully typed solution for managing access permissions with ease.
+
+### Key Features:
+- **Fully Typed**: Full TypeScript support for maximum type safety.
+- **Zero Dependencies**: Lightweight and ready to use.
+- **Serializable**: Easily store and retrieve roles and permissions from a database.
+
+---
+
+## Install
+
+```sh-session
+npm i @luascriptsROBLOX/access
+
+import { AccessControl, Role } from "@luascriptsROBLOX/access";
+
+/**
+ * Define all your resources and their access patterns.
+ *
+ * key => resource
+ * value => array of access types
+ */
+type Statements = {
+  user: ["read", "write", "custom-action"];
+  project: ["read", "write"];
+};
+
+/**
+ * Create an access control instance and pass the Statements type for type safety.
+ */
+const ac = new AccessControl<Statements>();
+
+/**
+ * Define roles with specific permissions.
+ */
+const role = ac.newRole({
+  user: ["read", "write"],
+  project: ["read"],
+});
+
+/**
+ * Simulate storing the role in a database.
+ */
+const serialized = role.toString();
+
+/**
+ * Retrieve and validate roles with full type safety.
+ */
+const recovered = Role.fromString<Statements>(serialized);
+
+/**
+ * Authorize requests by specifying the resource and required access type.
+ */
+const res = recovered.authorize({ project: ["read"] });
+
+// res.success => boolean
+// res.error => string | undefined (reason for failure)
